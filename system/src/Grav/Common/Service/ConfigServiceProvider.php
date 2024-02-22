@@ -1,64 +1,206 @@
 <?php
-namespace Grav\Common\Service;
-
-use Grav\Common\Config\Config;
-use Pimple\Container;
-use Pimple\ServiceProviderInterface;
-use RocketTheme\Toolbox\Blueprints\Blueprints;
 
 /**
- * The Config class contains configuration information.
+ * @package    Grav\Common\Service
  *
- * @author RocketTheme
- * @license MIT
+ * @copyright  Copyright (c) 2015 - 2024 Trilby Media, LLC. All rights reserved.
+ * @license    MIT License; see LICENSE file for details.
+ */
+
+namespace Grav\Common\Service;
+
+use DirectoryIterator;
+use Grav\Common\Config\CompiledBlueprints;
+use Grav\Common\Config\CompiledConfig;
+use Grav\Common\Config\CompiledLanguages;
+use Grav\Common\Config\Config;
+use Grav\Common\Config\ConfigFileFinder;
+use Grav\Common\Config\Setup;
+use Grav\Common\Language\Language;
+use Grav\Framework\Mime\MimeTypes;
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
+use RocketTheme\Toolbox\File\YamlFile;
+use RocketTheme\Toolbox\ResourceLocator\UniformResourceLocator;
+
+/**
+ * Class ConfigServiceProvider
+ * @package Grav\Common\Service
  */
 class ConfigServiceProvider implements ServiceProviderInterface
 {
-    private $environment;
-    private $setup;
-
+    /**
+     * @param Container $container
+     * @return void
+     */
     public function register(Container $container)
     {
-        $self = $this;
+        $container['setup'] = function ($c) {
+            $setup = new Setup($c);
+            $setup->init();
 
-        // Pre-load setup.php as it contains our initial configuration.
-        $file = GRAV_ROOT . '/setup.php';
-        $this->setup = is_file($file) ? (array) include $file : [];
-        $this->environment = isset($this->setup['environment']) ? $this->setup['environment'] : null;
-
-        $container['blueprints'] = function ($c) use ($self) {
-            return $self->loadMasterBlueprints($c);
+            return $setup;
         };
 
-        $container['config'] = function ($c) use ($self) {
-            return $self->loadMasterConfig($c);
+        $container['blueprints'] = function ($c) {
+            return static::blueprints($c);
+        };
+
+        $container['config'] = function ($c) {
+            $config = static::load($c);
+
+            // After configuration has been loaded, we can disable YAML compatibility if strict mode has been enabled.
+            if (!$config->get('system.strict_mode.yaml_compat', true)) {
+                YamlFile::globalSettings(['compat' => false, 'native' => true]);
+            }
+
+            return $config;
+        };
+
+        $container['mime'] = function ($c) {
+            /** @var Config $config */
+            $config = $c['config'];
+            $mimes = $config->get('mime.types', []);
+            foreach ($config->get('media.types', []) as $ext => $media) {
+                if (!empty($media['mime'])) {
+                    $mimes[$ext] = array_unique(array_merge([$media['mime']], $mimes[$ext] ?? []));
+                }
+            }
+
+            return MimeTypes::createFromMimes($mimes);
+        };
+
+        $container['languages'] = function ($c) {
+            return static::languages($c);
+        };
+
+        $container['language'] = function ($c) {
+            return new Language($c);
         };
     }
 
-    public function loadMasterConfig(Container $container)
+    /**
+     * @param Container $container
+     * @return mixed
+     */
+    public static function blueprints(Container $container)
     {
-        $environment = $this->getEnvironment($container);
+        /** Setup $setup */
+        $setup = $container['setup'];
 
-        $config = new Config($this->setup, $container, $environment);
+        /** @var UniformResourceLocator $locator */
+        $locator = $container['locator'];
+
+        $cache =  $locator->findResource('cache://compiled/blueprints', true, true);
+
+        $files = [];
+        $paths = $locator->findResources('blueprints://config');
+        $files += (new ConfigFileFinder)->locateFiles($paths);
+        $paths = $locator->findResources('plugins://');
+        $files += (new ConfigFileFinder)->setBase('plugins')->locateInFolders($paths, 'blueprints');
+        $paths = $locator->findResources('themes://');
+        $files += (new ConfigFileFinder)->setBase('themes')->locateInFolders($paths, 'blueprints');
+
+        $blueprints = new CompiledBlueprints($cache, $files, GRAV_ROOT);
+
+        return $blueprints->name("master-{$setup->environment}")->load();
+    }
+
+    /**
+     * @param Container $container
+     * @return Config
+     */
+    public static function load(Container $container)
+    {
+        /** Setup $setup */
+        $setup = $container['setup'];
+
+        /** @var UniformResourceLocator $locator */
+        $locator = $container['locator'];
+
+        $cache =  $locator->findResource('cache://compiled/config', true, true);
+
+        $files = [];
+        $paths = $locator->findResources('config://');
+        $files += (new ConfigFileFinder)->locateFiles($paths);
+        $paths = $locator->findResources('plugins://');
+        $files += (new ConfigFileFinder)->setBase('plugins')->locateInFolders($paths);
+        $paths = $locator->findResources('themes://');
+        $files += (new ConfigFileFinder)->setBase('themes')->locateInFolders($paths);
+
+        $compiled = new CompiledConfig($cache, $files, GRAV_ROOT);
+        $compiled->setBlueprints(function () use ($container) {
+            return $container['blueprints'];
+        });
+
+        $config = $compiled->name("master-{$setup->environment}")->load();
+        $config->environment = $setup->environment;
 
         return $config;
     }
 
-    public function loadMasterBlueprints(Container $container)
+    /**
+     * @param Container $container
+     * @return mixed
+     */
+    public static function languages(Container $container)
     {
-        $environment = $this->getEnvironment($container);
-        $file = CACHE_DIR . 'compiled/blueprints/master-'.$environment.'.php';
-        $data = is_file($file) ? (array) include $file : [];
+        /** @var Setup $setup */
+        $setup = $container['setup'];
 
-        return new Blueprints($data, $container);
-    }
+        /** @var Config $config */
+        $config = $container['config'];
 
-    public function getEnvironment(Container $container)
-    {
-        if (!isset($this->environment)) {
-            $this->environment = $container['uri']->environment();
+        /** @var UniformResourceLocator $locator */
+        $locator = $container['locator'];
+
+        $cache = $locator->findResource('cache://compiled/languages', true, true);
+        $files = [];
+
+        // Process languages only if enabled in configuration.
+        if ($config->get('system.languages.translations', true)) {
+            $paths = $locator->findResources('languages://');
+            $files += (new ConfigFileFinder)->locateFiles($paths);
+            $paths = $locator->findResources('plugins://');
+            $files += (new ConfigFileFinder)->setBase('plugins')->locateInFolders($paths, 'languages');
+            $paths = static::pluginFolderPaths($paths, 'languages');
+            $files += (new ConfigFileFinder)->locateFiles($paths);
         }
 
-        return $this->environment;
+        $languages = new CompiledLanguages($cache, $files, GRAV_ROOT);
+
+        return $languages->name("master-{$setup->environment}")->load();
+    }
+
+    /**
+     * Find specific paths in plugins
+     *
+     * @param array $plugins
+     * @param string $folder_path
+     * @return array
+     */
+    protected static function pluginFolderPaths($plugins, $folder_path)
+    {
+        $paths = [];
+
+        foreach ($plugins as $path) {
+            $iterator = new DirectoryIterator($path);
+
+            /** @var DirectoryIterator $directory */
+            foreach ($iterator as $directory) {
+                if (!$directory->isDir() || $directory->isDot()) {
+                    continue;
+                }
+
+                // Path to the languages folder
+                $lang_path = $directory->getPathName() . '/' . $folder_path;
+
+                // If this folder exists, add it to the list of paths
+                if (file_exists($lang_path)) {
+                    $paths []= $lang_path;
+                }
+            }
+        }
+        return $paths;
     }
 }
