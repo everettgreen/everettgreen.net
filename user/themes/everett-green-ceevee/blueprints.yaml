@@ -1,0 +1,18 @@
+name: Everett Green Ceevee
+slug: everett-green-ceevee
+type: theme
+version: 0.1.0
+description: Personal Site, everettgreen.net, based on Ceevee theme
+icon: rebel
+author:
+  name: Everett Green
+  email: everett.k.green@gmail.com
+homepage: https://github.com/everettgreen/grav-theme-everett-green-ceevee
+demo: http://demo.yoursite.com
+keywords: grav, theme, etc
+bugs: https://github.com/everettgreen/grav-theme-everett-green-ceevee/issues
+readme: https://github.com/everettgreen/grav-theme-everett-green-ceevee/blob/develop/README.md
+license: MIT
+
+dependencies:
+  - { name: grav, version: '>=1.6.0' }

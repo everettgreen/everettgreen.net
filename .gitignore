@@ -22,6 +22,7 @@ user/plugins/*
 !user/plugins/.*
 user/themes/*
 !user/themes/.*
+!user/themes/everett-green-ceevee
 
 # OS Generated
 .DS_Store*

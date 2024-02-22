@@ -15,7 +15,10 @@ social:
 - url: "https://www.facebook.com/everett.green"
   icon: facebook
 - url: "https://twitter.com/everettgreen"
-  icon: twitter
+  icon: x-twitter
 - url: "https://www.linkedin.com/in/everettkgreen"
   icon: linkedin
-
+- url: "https://www.github.com/everettgreen"
+  icon: github
+- url: "https://www.salesforce.com/trailblazer/everettgreen"
+  icon: salesforce

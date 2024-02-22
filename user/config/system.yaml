@@ -2,12 +2,12 @@ home:
   alias: '/home'
 
 pages:
-  theme: ceevee
+  theme: everett-green-ceevee
   process:
     markdown: true
     twig: true
   markdown:
-    extra: true  
+    extra: true
 
 cache:
   enabled: false

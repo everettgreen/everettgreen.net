@@ -1,0 +1,48 @@
+<section id="resume">
+    {% for section in page.header.sections %}
+        {% if section.css_class == "conferences" %}
+        {% else %}
+    <div class="row {{ section.css_class }}">
+        <div class="three columns header-col">
+            <h1><span>{{ section.title }}</span></h1>
+        </div>
+        <div class="nine columns main-col">
+            {% for item in section.items %}
+            <div class="row item">
+                <div class="twelve columns">
+                    {% if section.css_class == "certifications" %}
+                        {% if false and item.title %}
+                            <div class="certification">
+                                <img src="/user/themes/everett-green-ceevee/images/{{ item.image }}" alt="{{ item.title }} Certificate Badge" class="badge">
+                                <h3 class="cert-title"><a href="{{ item.url }}">{{ item.title }}</a></h3>
+                                <p class="info cert-status"><em class="date">Acquired: {{ item.status }}</em></p>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        {% if item.title %}
+                        <h3>{{ item.title }}</h3>
+                        {% endif %}
+                        {% if item.info or item.date %}
+                        <p class="info">{{ item.info }} <span>&bull;</span> <em class="date">{{ item.date }}</em></p>
+                        {% endif %}
+                        <p>
+                            {{ item.description }}
+                        </p>
+
+                        {% if item.skills %}
+                        <ul class="skills">
+                            {% for skill in item.skills %}
+                            <li>{{ skill.name }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    {% endif %}
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+            {% endif %}
+    {% endfor %}
+</section>

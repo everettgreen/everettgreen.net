@@ -16,12 +16,12 @@ sections:
                 date: 'May 2005 - Present'
                 description: 'When interesting challenges come my way, I am eager to solve problems, expand my skillset, and share my expertise. I''ve lent my e-commerce, PHP, and web performance skills to numerous sites over the years.'
             -
-                title: Cricut
+                title: 'Cricut - SFCC'
                 info: 'Salesforce Commerce Cloud Engineer'
                 date: 'October 2021 - May 2023'
                 description: 'Underwent CCD102 virtual training to learn more about SFCC Development before passing B2C Commerce Developer certification in Jan 2022. Supported team through launch of multi-realm, multi-store migration from Magento 2 to SFCC on SFRA. Worked heavily with SFCC Business Manager to implement subscriber benefits and upsell via promotions, middleware, helpers, and custom templates. Resolved issues with Cart Abandonment integration using Google Tag Manager.'
             -
-                title: Cricut
+                title: 'Cricut - Magento'
                 info: 'Senior Magento Engineer'
                 date: 'June 2020 - October 2021'
                 description: 'Acted as production support through peak order volume >200/min, assisting with load testing planning and execution. Created and managed Docker environment and bespoke Bash utilities for working with our non-prod environments. Assisted SRE managing our Varnish config and AWS environments. Leveraged Blackfire PHP profiling, strace, and other tools to identify and resolve performance issues across the stack, leading to major performance wins ahead of important ‘20 Black Friday sale, and in April ‘21 leading to thousands in infrastructure cost savings. Resolved several issues with Google Tag Manager implementation, including with EMS and visitor ID.'
@@ -43,7 +43,7 @@ sections:
                 title: null
                 info: null
                 date: null
-                description: 'I am confident developing solutions for Magento (Adobe Commerce) 1 and 2, Salesforce B2C Commerce Cloud (Demandware / SFCC), and WordPress. I am experienced with several frameworks, with a bias toward Laravel. I use Git for my projects but have SVN and Mercurial experience. I am confident debugging with PHPStorm + Xdebug and VSCode + Prophet to troubleshoot issues. I''m comfortable with Eloquent ORM, but also confident writing raw SQL for reporting and answering business questions.'
+                description: 'I am confident developing solutions for Magento (Adobe Commerce) 1 and 2, Salesforce B2C Commerce Cloud (Demandware / SFCC), and WordPress.  I use Git for my projects but have SVN and Mercurial experience. I am adept at debugging with PHPStorm + Xdebug and VSCode + Prophet to troubleshoot issues. I''m comfortable with Eloquent ORM, but also capable writing raw SQL for reporting and answering business questions.'
                 skills:
                     -
                         name: Magento
@@ -56,13 +56,29 @@ sections:
                     -
                         name: PHP
                     -
-                        name: Laravel
-                    -
                         name: HTML
                     -
                         name: CSS
+                    -
+                        name: 'Google Analytics (GA4)'
+                    -
+                        name: 'Google Tag Manager'
     -
-        title: 'Conferences and Training'
+        title: Certifications
+        css_class: certifications
+        items:
+            -
+                title: 'Salesforce B2C Commerce Cloud Developer'
+                status: 'January 2022'
+                image: SFCCCertifiedDeveloper.png
+                url: 'https://www.salesforce.com/trailblazer/everettgreen'
+            -
+                title: 'Adobe Commerce (Magento 2) Certified Solution Specialist'
+                status: 'December 2017 (Expired July 2023)'
+                image: M2CertifiedSolutionSpecialist.png
+                url: 'https://community.magento.com/t5/user/viewprofilepage/user-id/346467'
+    -
+        title: Conferences
         css_class: conferences
         items:
             -
@@ -77,13 +93,15 @@ sections:
             -
                 title: LoneStarPHP
                 date: 2014
-            -
-                title: 'Salesforce CCD-102'
-                date: 2021
     -
         title: Education
         css_class: education
         items:
+            -
+                title: 'Salesforce Live Virtual Training CCD102'
+                info: 'B2C Commerce Developer with SFRA; Instructor: Bhalinder Singh'
+                date: 'November 2021'
+                description: 'Attended weeklong course with live instructor, actively participated, taking and sharing notes with teammates.'
             -
                 title: 'Pellissippi State Community College'
                 info: 'AAS, Computer Programming'
