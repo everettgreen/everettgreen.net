@@ -1,6 +1,6 @@
 <section id="resume">
     {% for section in page.header.sections %}
-        {% if section.css_class == "conferences" %}
+        {% if section.css_class == "conferences" or section.css_class == "certifications" %}
         {% else %}
     <div class="row {{ section.css_class }}">
         <div class="three columns header-col">
@@ -13,7 +13,7 @@
                     {% if section.css_class == "certifications" %}
                         {% if false and item.title %}
                             <div class="certification">
-                                <img src="/user/themes/everett-green-ceevee/images/{{ item.image }}" alt="{{ item.title }} Certificate Badge" class="badge">
+                                <img src="{{ url('theme://images/') }}{{ item.image }}" alt="{{ item.title }} Certificate Badge" class="badge">
                                 <h3 class="cert-title"><a href="{{ item.url }}">{{ item.title }}</a></h3>
                                 <p class="info cert-status"><em class="date">Acquired: {{ item.status }}</em></p>
                             </div>
